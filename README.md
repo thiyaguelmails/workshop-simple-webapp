@@ -83,8 +83,7 @@ Have the ASG maintain an average of 50% CPU load across the fleet.
 
    5. Still in **Launch Configuration**, in Advanced Details, make sure you put in the User data startup script we used in Module 02.
    ```
-   #!/bin/bash -xe
-   exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+   #!/bin/bash
    
    curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | sh
    source /.nvm/nvm.sh
