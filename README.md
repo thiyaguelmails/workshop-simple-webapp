@@ -193,4 +193,4 @@ around ~250 HTTPS requests to serve your page. Of these 250, only 206 are of sta
 In this module, we also touched a bit into implementing security and credentials into our web application, however, we honestly did it in a very insecure and dangerous way (like saving our access keys to the server environment variables --- yikes!). In the next module, let's explore ways to improve that.
 
 
-**Next:** [Improve security with IAM Roles](team-siklab/workshop-simple-webapp/tree/module-04)
+**Next:** [Improve security with IAM Roles](../../tree/module-05)
