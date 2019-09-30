@@ -184,18 +184,11 @@ If you don't have any preferences, `tmux` is a good choice.
      `cd webapp` to go into your project directory, switch to the module branch with `git checkout module-01`, and then run `npm install` to install all the project dependencies.
 
   8. When you terminate your SSH connection later, this will also stop all processes you've run (including your web server).
-     To prevent this from happening, we can use a terminal multiplexer to create a process separate from the one governing our connection.
-     Install `tmux`, a popular current-generation terminal multiplexer, by running `sudo apt-get install tmux -y`.
+     To prevent this from happening, we can use a command called `nohup` to create a process separate from the one governing our connection.
 
-  9. Run `tmux` to start the multiplexer.
-
-  > **Note**: By running `tmux`, you're creating a completely separate process from the one you're on with your SSH connection.
-  > - To go back to your original process (and leave whatever you're doing in `tmux` temporarily), just type `Ctrl+b` then `d` on your keyboard.
-  > - To bo back into the `tmux` process (and go back to what you were doing), just type `tmux a`.
-
-  10. Make sure you're in your project directory, then run `npm start` to start your web server. By default, your server will start listening on port `3000`.
+  9. Run `nohup node app.js > ~/output.log &` to start your webserver in the background.
   
-  11. Locate your EC2 instance's **public IPv4 address** again, and confirm your web server is viewable by visiting `http://instance-ip-address:3000/hello` from a browser.
+  10. Locate your EC2 instance's **public IPv4 address** again, and confirm your web server is viewable by visiting `http://instance-ip-address:3000/hello` from a browser.
 
   ```
   e.g.
@@ -203,12 +196,9 @@ If you don't have any preferences, `tmux` is a good choice.
   http://127.0.0.1:3000/hello
   ```
 
-  12. If you get a meaningful response, congratulations, and you've successfully run a web server on your EC2 instance!
-  
-  13. Back in your terminal, let's exit your SSH connection while leaving your web server running.
-      Press `Ctrl-b` then `d` to detach your current `tmux` process, then type in `exit` to terminate your SSH connection.
+  11. If you get a meaningful response, congratulations, and you've successfully run a web server on your EC2 instance!
 
-  14. Confirm that your web server is still viewable even when your SSH connection is closed.
+  12. Confirm that your web server is still viewable even when your SSH connection is closed.
   </p>
 </details>
 
