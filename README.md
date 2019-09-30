@@ -204,4 +204,4 @@ Because we are able to provision new resources so quickly on the AWS cloud, we d
 In the next module, let's expand our web application a bit to use other AWS services.
 
 
-**Next:** [Using S3 to store file uploads](team-siklab/workshop-simple-webapp/tree/module-04)
+**Next:** [Using S3 to store file uploads](../../tree/module-04)
