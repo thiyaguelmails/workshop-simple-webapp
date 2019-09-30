@@ -193,4 +193,5 @@ to make our application adapt automatically to changing demand and usage, as wel
 self-repair itself when the needs for it arise.
 
 
-**Next:** [Improve scalability with auto-scaling](team-siklab/workshop-simple-webapp/tree/module-02)
+
+**Next:** [Improve scalability with auto-scaling](../../tree/module-03)
