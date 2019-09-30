@@ -173,7 +173,7 @@ If you don't have any preferences, `tmux` is a good choice.
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
   ```
 
-  4. After installing `nvm`, you will need to close the SSH connection by typing `exit`, then reconnect again.
+  4. After installing `nvm`, you will need to restart your shell by typing `exec bash`, to end the old session and start a new one on the same window.
      Doing this step ensures that your SSH connection knows that there is a new `nvm` command available for you.
 
   5. Install Node.js version 8.10 by running `nvm install 8.10`.
