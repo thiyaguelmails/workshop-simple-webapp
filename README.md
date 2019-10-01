@@ -132,9 +132,10 @@ Update your auto-scaling group to use this new launch configuration.
 2. Look for your current configuration, and opt to make a copy of it.
 
 3. In `Step 3` of the resulting wizard, adjust the value of **IAM Role** so that it matches the role you just created. Save all your changes.
+  1. Also remove the two `export` statements for `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` from the configuration **User data**. This way we our access keys are not hardcoded anywhere in our system.
 
 4. Navigate to your **Auto scaling groups**, and edit your current ASG so that it uses your updated launch configuration. Save your changes to your ASG.
-  1. Also remove the two `export` statements for `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` from the configuration **User data**. This way we our access keys are not hardcoded anywhere in our system.
+  
 
 5. Terminate the current instances under your ASG, and let it self-heal. This may take a few minutes.
 
