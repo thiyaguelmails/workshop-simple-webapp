@@ -126,8 +126,7 @@ We will need to update our auto-scaling launch configuration to take these varia
    1. (Optional) You might want to change the name to something more meaningful.
    2. In **User data** under Advanced Details, update it to the following. Make sure you change the appropriate values for the 3 `export` statements.
 ```
-#!/bin/bash -xe
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+#!/bin/bash 
 
 export AWS_ACCESS_KEY=<your access key>
 export AWS_SECRET_ACCESS_KEY=<your secret access key>
