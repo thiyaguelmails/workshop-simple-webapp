@@ -136,7 +136,6 @@ Update your auto-scaling group to use this new launch configuration.
 
 4. Navigate to your **Auto scaling groups**, and edit your current ASG so that it uses your updated launch configuration. Save your changes to your ASG.
   
-
 5. Terminate the current instances under your ASG, and let it self-heal. This may take a few minutes.
 
 6. Confirm that the web server now has permission to upload to your S3 bucket again by attempting to upload a file from the image upload form.
