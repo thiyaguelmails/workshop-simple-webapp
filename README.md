@@ -97,9 +97,20 @@ Make sure that this instance is publicly accessible both for `SSH` and `HTTP`, a
   11. Click **Launch instance**.
 
   Your instance should be visible from the dashboard immediately, and will be ready for use in about 30 seconds.
+  12. Locate your EC2 instance's **public IPv4 address** again, and confirm your web server is viewable by visiting `http://instance-ip-address:3000/hello` from a browser.
+
+  ```
+  e.g.
+
+  http://127.0.0.1:3000/hello
+  ```
+
+  13. If you get a meaningful response, congratulations, and you've successfully run a web server on your EC2 instance!
+  
   </p>
 </details>
 
+## Extra Tasks:
 
 ### 2. Connect to your instance via SSH
 
@@ -146,7 +157,7 @@ has `chmod 400` permissions.
 </details>
 
 
-### 3. Install the necessary software to run the server
+### 3. Run Linux Commands on the Server
 
 When you run commands in an SSH connection, you're actually running them inside your EC2 instance,
 and all the output is just fed back to your screen. It uses its own resources in the cloud, and 
@@ -157,66 +168,8 @@ it's actually using its own dedicated network connections, and not the internet 
 probably using now. Because of this, you'll probably find that your EC2 instance finishes tasks
 you instruct it to do **significantly faster** than if you did them on your own physical machine.
 
-In this step, we'll run all the commands required to setup and prepare our machine to run our server.
-As you'll discover in the next modules, there are ways so that you won't have to do this manually every time 
-you need an EC2 instance. 
+Try running `sudo systemctl status httpd` to see that your web server is running!
 
-For now, bear with us, because we want to give you the full experience of bootstrapping a system on your own.
-
-
-#### High level instructions
-
-Update the software packages on your EC2 instance, and install **version 8.10** of Node.js on it.
-(Any version `> v8.10` should work, but since this workshop was built with v8.10 in mind, it's probably best to just use that.)
-
-Clone this repository into the machine as well, and install the `npm` dependencies for this solution.
-
-Finally you will need to install a terminal multiplexer so that your server doesn't stop when you terminate your SSH connection.
-If you don't have any preferences, `tmux` is a good choice.
-
-<details>
-  <summary><strong>Step-by-step instructions (click to expand):</strong></summary>
-  <p>
-    
-  1. Ensure you're inside an SSH connection to your instance.
-  
-  2. Run `sudo apt-get update -y`. This will bring all installed packages on your instance up-to-date.
-  
-  3. To make installing a specific version of Node.js easier, we'll use `nvm` command to manage our Node versions for us.
-     You can [follow the instructions here](https://github.com/creationix/nvm#install--update-script) to install `nvm`, or just:
-
-  ```
-  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-  ```
-
-  4. After installing `nvm`, you will need to restart your shell by typing `exec bash`, to end the old session and start a new one on the same window.
-     Doing this step ensures that your SSH connection knows that there is a new `nvm` command available for you.
-
-  5. Install Node.js version 8.10 by running `nvm install 8.10`.
-  
-  6. Clone this repository onto youjr machine by running `git clone https://github.com/team-siklab/workshop-simple-webapp.git webapp`.
-  
-  7. We've already prepared this project repository to automatically install everything it needs to run a server.
-     `cd webapp` to go into your project directory, switch to the module branch with `git checkout module-01`, and then run `npm install` to install all the project dependencies.
-
-  8. When you terminate your SSH connection later, this will also stop all processes you've run (including your web server).
-     To prevent this from happening, we can use a command called `nohup` to create a process separate from the one governing our connection.
-
-  9. Run `nohup node app.js > ~/output.log &` to start your webserver in the background.
-  
-  10. Locate your EC2 instance's **public IPv4 address** again, and confirm your web server is viewable by visiting `http://instance-ip-address:3000/hello` from a browser.
-
-  ```
-  e.g.
-
-  http://127.0.0.1:3000/hello
-  ```
-
-  11. If you get a meaningful response, congratulations, and you've successfully run a web server on your EC2 instance!
-
-  12. Confirm that your web server is still viewable even when your SSH connection is closed.
-  </p>
-</details>
 
 ## Summary
 
