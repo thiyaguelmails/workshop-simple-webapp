@@ -1,183 +1,212 @@
-Module 1: Deploy a PHP webapp on EC2
-===
+# Getting Started with RDS
 
-In this module, we'll walk through how to create an EC2 instance on AWS, 
-and running a web server on it using Node.js. 
+Task 1: Create a Security Group for the RDS DB Instance
+-------------------------------------------------------
 
-While it would be helpful if you're fluent with Node.js / Javascript, no previous
-experience with it is required as all the code is already provided for you.
+In this task, you will create a security group to allow your web server
+to access your RDS DB instance. The security group will be used when you
+launch the database instance.
 
-## Solution Architecture
+5.  In the **AWS Management Console**, on the []{#anchor}Services menu,
+    click **VPC**.
+6.  In the left navigation pane, click **Security Groups**.
+7.  Click []{#anchor-1}Create security group and then configure:
 
-The architecture for this module is really simple --- we'll deploy a single EC2 instance
-on AWS, and use that as a web server. All HTTP requests going into our web app will be
-received and addressed by this EC2 instance.
+    -   **Security group name:** *DB Security Group*
+    -   **Description:** *Permit access from Web Security Group*
+    -   **VPC:** *Lab VPC*
 
-![architecture](__assets/architecture.png)
+8.  Click []{#anchor-2}Create then click []{#anchor-3}Close
 
-Amazon EC2 instances need to be deployed into a VPC, in one of the network subnets 
-configured inside. We'll use this characteristic to improve our application in the next module.
-For now, just keep this in mind.
+    You will now add a rule to the security group to permit inbound
+    database requests.
 
-## Implementation Overview
+9.  Select **DB Security Group**.
+10. Click the **Inbound Rules** tab.
 
-Each of the following sections provides an implementation overview, as well as detailed
-step-by-step instructions you can follow to complete the module. The overview should provide
-enough context for you to complete the implementation if you're already familiar with
-the AWS Management Console , or if you want to explore the services yourself
-without following a walkthrough.
+    The security group currently has no rules. You will add a rule to
+    permit access from the **Security Group you made in module 1**.
 
-> **Note**: We'll just call the **AWS Management Console** as just the **console** from here on.
+11. Click []{#anchor-4}Edit rules
+12. Click []{#anchor-5}Add Rule then configure:
 
-### Region Selection
+    -   **Type:** *MySQL/Aurora (3306)*
+    -   **CIDR, IP, Security Group or Prefix List:** Type *sg* and then
+        select *Web Security Group*.
 
-If you're completing this module as part of a workshop or classroom setting, you will probably
-have been given instructions on which AWS region to use. Please confirm this with your facilitator.
+    This configures the Database security group to permit inbound
+    traffic on port 3306 from any EC2 instance that is associated with
+    the *Web Security Group*.
 
-Otherwise, feel free to use any available region on the AWS Management Console.
+13. Click []{#anchor-6}Save rules then click []{#anchor-7}Close
 
-Once you've chosen a region, you should use that region **for the entire workshop**. 
+    You will use this security group when launching the Amazon RDS
+    database.
 
-You can choose which region you're working in at the top-right corner menu of the AWS Management Console.
+ 
 
-![region selection](__assets/region-selection.png)
+Task 2: Create a DB Subnet Group
+--------------------------------
 
-### 1. Create an EC2 instance
+In this task, you will create a *DB subnet group* that is used to tell
+RDS which subnets can be used for the database. Each DB subnet group
+requires subnets in at least two Availability Zones.
 
-Amazon EC2 lets you create virtual machines on the AWS cloud. Once created, you can use
-it as you would use most any other computer or virtual machine. For this module,
-we'll create and prepare an EC2 instance to run a server we can use to host a website.
+14. On the []{#anchor-8}Services menu, click **RDS**.
+15. In the left navigation pane, click **Subnet groups**.
 
-#### High-level instructions
+    If the navigation pane is not visible, click the menu icon in the
+    top-left corner.
 
-Use the console or AWS CLI to create an Amazon EC2 `t3.micro` instance, using an `Ubuntu 18.04 LTS` AMI.
-Make sure that this instance is publicly accessible both for `SSH` and `HTTP`, and has an assigned public IPv4 address.
+16. Click []{#anchor-9}Create DB Subnet Group then configure:
 
-<details>
-  <summary><strong>Step-by-step instructions (expand for details)</strong></summary>
-  <p>
-    
-  1. In the console, choose **Services** at the top-left menu, and choose **EC2** under Compute.
-    
-  2. Click the *Launch Instance** button. This will start a step-by-step wizard for creating a new EC2 instance.
-  3. In the `Step 1` screen: select an **Ubuntu 18.04 LTS** AMI. 
-  4. In the `Step 2` screen: select a `t3.micro` instance. 
-  5. In the `Step 3` screen: confirm that the following configuration is set:
-     1. For `Network`, the default VPC is selected.
-     2. For `Auto-assign public IP`, make sure this is enabled.
-     3. Expand **Advanced Details** and place the following code in the userdata field:
-     
-     ```
-      #!/bin/bash -ex
-      yum -y update
-      yum -y install httpd php mysql php-mysql
-      chkconfig httpd on
-      sudo systemctl start httpd
-      if [ ! -f /var/www/html/lab2-app.tar.gz ]; then
-      cd /var/www/html
-      wget https://us-west-2-aws-training.s3.amazonaws.com/awsu-ilt/AWS-100-ESS/v4.2/lab-2-configure-website-datastore/scripts/lab2-app.tar.gz
-      tar xvfz lab2-app.tar.gz
-      chown apache:root /var/www/html/rds.conf.php
-      fi
-     ```
-     
-  6. In the `Step 4` screen: specify `10 GB` for the root volume.
-  7. In the `Step 5` screen: add a **Name** to your instance.
+    -   **Name:** *DB Subnet Group*
+    -   **Description:** *DB Subnet Group*
+    -   **VPC:** *Lab VPC*
+    -   **Availability zone:** Select the *first* Availability Zone
+    -   **Subnet:** *10.0.1.0/24*
+    -   Click []{#anchor-10}Add subnet
 
-  > **Note**: in a classroom setting, this will help identify your instance from others doing the same workshop.
+    This added Private Subnet 1. You will now add Private Subnet 2.
 
-  8. In the `Step 6` screen:
-     1. Opt to create a new security group. **Important**: give your security group a unique name you'll remember.
-     2. Add rules to allow `SSH` and `HTTP` from **anywhere** to your security group.
-     3. Also add a rule to allow `TCP` traffic through port `3000` from **anywhere** to your security group.
-     4. Click **Next**.
+17. Configure these settings (on the existing screen):
 
-  9. In the `Step 7` screen: confirm all your settings.
-  10. A dialog box should appear. Opt to **create a new keypair**. Give your keypair a name, a download it to your machine. Take note of where you saved it.
-  11. Click **Launch instance**.
+    -   **Availability zone:** Select the *second* Availability Zone
+    -   **Subnet:** *10.0.3.0/24*
+    -   Click []{#anchor-11}Add subnet
 
-  Your instance should be visible from the dashboard immediately, and will be ready for use in about 30 seconds.
-  12. Locate your EC2 instance's **public IPv4 address** again, and confirm your web server is viewable by visiting `http://instance-ip-address:3000/hello` from a browser.
+    These subnets should now be shown in the list: **10.0.1.0/24** and
+    **10.0.3.0/24**
 
-  ```
-  e.g.
+18. Click []{#anchor-12}Create
 
-  http://127.0.0.1:3000/hello
-  ```
+    You will use this DB subnet group when creating the database in the
+    next task.
 
-  13. If you get a meaningful response, congratulations, and you've successfully run a web server on your EC2 instance!
-  
-  </p>
-</details>
+ 
 
-## Extra Tasks:
+Task 3: Create an Amazon RDS DB Instance
+----------------------------------------
 
-### 2. Connect to your instance via SSH
+In this task, you will configure and launch a Multi-AZ Amazon RDS for
+MySQL database instance.
 
-Linux-based instances allow you to SSH into them --- once an SSH connection has been established,
-you can run commands from inside the machine, and effectively use the instance as if
-it was right in front of you.
+Amazon RDS *****Multi-AZ***** deployments provide enhanced availability
+and durability for Database (DB) instances, making them a natural fit
+for production database workloads. When you provision a Multi-AZ DB
+instance, Amazon RDS automatically creates a primary DB instance and
+synchronously replicates the data to a standby instance in a different
+Availability Zone (AZ).
 
-To establish an SSH connection, you will need the keypair you created in the previous step:
-the private half of that key is what you downloaded, and the public half of it has been
-baked into the EC2 instance. Only those who have a copy of the private key can connect
-to it, so **keep your keyfiles in a safe place**!
+19. In the left navigation pane, click **Databases**.
+20. Click []{#anchor-13}Create database
 
-#### High-level instructions
+    If you see **Switch to the new database creation flow** at the top
+    of the screen, please click it.
 
-Establish an SSH connection to your EC2 instance. You will need to ensure that your keyfile
-has `chmod 400` permissions.
+21. Select **MySQL**.
+22. Under **Settings**, configure:
 
-<details>
-  <summary><strong>Step-by-step instructions (click to expand):</strong></summary>
-  <p>
-    
-  1. Locate the keyfile you downloaded in your computer. Optionally make sure it's in a directory that you can access easily.
-    
-  2. In your terminal, run `chmod 400 [keyfile]`, where `[keyfile]` is the path to your keyfile `PEM` file.
-     Your EC2 instance will reject connections if it detects that your keyfile is too open to the world.
+    -   **DB instance identifier:** *lab-db*
+    -   **Master username:** *master*
+    -   **Master password:** *lab-password*
+    -   **Confirm password:** *lab-password*
 
-  ```
-  e.g.
+23. Under **DB instance size**, configure:
 
-  chmod 400 ~/keys/my-keyfile.pem
-  ```
+    -   Select **Burstable classes (includes t classes)**.
+    -   Select *db.t3.micro*
 
-  3. Locate your EC2 instance's **public IPv4 address** in your EC2 dashboard. It should be in the **Desription** tab when selected.
-  4. To establish an SSH connection, run `ssh -i [your keyfile] ubuntu@[public IPv4 address]`.
-     Substitute the appropriate values for `[your keyfile]` and `[public IPv4 address]`.
+24. Under **Storage**, configure:
 
-  ```
-  e.g.
+    -   **Storage type:** *General Purpose (SSD)*
+    -   **Allocated storage:** *20*
 
-  ssh -i ~/keys/my-keyfile.pem ubuntu@127.0.0.1
-  ```
-  5. You should see a welcome message if an SSH connection has been successfully established.
-  </p>
-</details>
+25. Under **Connectivity**, configure:
+
+    -   **Virtual Private Cloud (VPC):** *Lab VPC*
+
+26. Expand **Additional connectivity configuration**, then configure:
+
+    -   For **Existing VPC security groups:** click *DB Security Group*
+        to highlight it in blue.
+
+27. Expand **Additional configuration**, then configure:
+
+    -   **Initial database name:** *lab*
+    -   Uncheck **Enable automatic backups**.
+    -   Uncheck **Enable Enhanced monitoring**.
+
+    This will turn off backups, which is not normally recommended, but
+    will make the database deploy faster for this lab.
+
+28. Click []{#anchor-14}Create database
+
+    Your database will now be launched.
+
+    If you receive an error that mentions "not authorized to perform:
+    iam:CreateRole", make sure you unchecked *Enable Enhanced
+    monitoring* in the previous step.
+
+29. Click **lab-db** (click the link itself).
+
+    You will now need to wait **approximately 4 minutes** for the
+    database to be available. The deployment process is deploying a
+    database in two different Availability zones.
+
+    While you are waiting, you might want to review the [Amazon RDS
+    FAQs](https://aws.amazon.com/rds/faqs/) or grab a cup of coffee.
+
+30. Wait until **Info** changes to **Modifying** or **Available**.
+31. Scroll down to the **Connectivity & security** section and copy the
+    **Endpoint** field.
+
+    It will look similar to:
+    *lab-db.cggq8lhnxvnv.us-west-2.rds.amazonaws.com*
+
+32. Paste the Endpoint value into a text editor. You will use it later
+    in the lab.
+
+ 
+
+Task 4: Interact with Your Database
+-----------------------------------
+
+In this task, you will open a web application running on your web server
+and configure it to use the database.
+
+33. To copy the **WebServer** IP address, click on the
+    []{#anchor-15}Details drop down menu above these instructions, and
+    then click []{#anchor-16}Show.
+34. Open a new web browser tab, paste the *WebServer* IP address and
+    press Enter.
+
+    The web application will be displayed, showing information about the
+    EC2 instance.
+
+35. Click the **RDS** link at the top of the page.
+
+    You will now configure the application to connect to your database.
+
+36. Configure the following settings:
+
+    -   **Endpoint:** Paste the Endpoint you copied to a text editor
+        earlier
+    -   **Database:** *lab*
+    -   **Username:** *master*
+    -   **Password:** *lab-password*
+    -   Click **Submit**
+
+    A message will appear explaining that the application is executing a
+    command to copy information to the database. After a few seconds the
+    application will display an **Address Book**.
+
+    The Address Book application is using the RDS database to store
+    information.
+
+37. Test the web application by adding, editing and removing contacts.
+
+    The data is being persisted to the database and is automatically
+    replicating to the second Availability Zone.
 
 
-### 3. Run Linux Commands on the Server
-
-When you run commands in an SSH connection, you're actually running them inside your EC2 instance,
-and all the output is just fed back to your screen. It uses its own resources in the cloud, and 
-doesn't use the computer you're physically using except to show you what's happening.
-
-For example, when you run a script to make your EC2 instance download updates for its software,
-it's actually using its own dedicated network connections, and not the internet connection you're
-probably using now. Because of this, you'll probably find that your EC2 instance finishes tasks
-you instruct it to do **significantly faster** than if you did them on your own physical machine.
-
-Try running `sudo systemctl status httpd` to see that your web server is running!
-
-
-## Summary
-
-In this module, we created a single EC2 instance, and set it up to run a website, so that it can be
-visited through the public internet.
-
-In the next modules, we'll look into ways we can improve on that process, as well as look into how we
-can use EC2 instances in creative ways to improve web application durability and scalability.
-
-
-**Next:** [Augment your webapp with load balancing](../../tree/module-02)
