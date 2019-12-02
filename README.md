@@ -79,33 +79,29 @@ Make sure that the EC2 instance is in a different **public** subnet as your firs
       
     3. Also in `Step 3`: at the very bottom in **Advanced Settings**, add in the following startup script:
     ```
-    #!/bin/bash
-
-    curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | sh
-    source /.nvm/nvm.sh
-
-    nvm install 8.10
-    nvm use 8.10
-    npm install -g forever
-
-    git clone https://github.com/team-siklab/workshop-simple-webapp.git app
-    cd app
-    git checkout module-02
-
-    npm install
-    forever start app.js
+      #!/bin/bash -ex
+      yum -y update
+      yum -y install httpd php mysql php-mysql
+      chkconfig httpd on
+      sudo systemctl start httpd
+      if [ ! -f /var/www/html/lab2-app.tar.gz ]; then
+      cd /var/www/html
+      wget https://us-west-2-aws-training.s3.amazonaws.com/awsu-ilt/AWS-100-ESS/v4.2/lab-2-configure-website-datastore/scripts/lab2-app.tar.gz
+      tar xvfz lab2-app.tar.gz
+      chown apache:root /var/www/html/rds.conf.php
+      fi
     ```
 
     4. In `Step 6`: Make sure you use the same security group as the one you created before.
     5. For your keypair: opt to use an existing one, and use the keypair you created before.
 
 2. Once your EC2 instance is ready, confirm that you can visit your web server on it by visiting it's
-   **public IPv4 address** at port **3000**.
+   **public IPv4 address**.
 
     ```
     e.g.
 
-    http://52.221.0.100:3000
+    http://52.221.0.100
     ```
   </p>
 </details>
@@ -122,7 +118,7 @@ We will also use this setup later when we get to automatically healing and scali
 #### High-level instructions
 
 Create an ALB and a target group, and add the two instances you already have into the target group.
-Ensure that the `:80` listener on the ALB redirects to the `:3000` listener on the servers.
+Ensure that the `:80` listener on the ALB redirects to the `:80` listener on the servers.
 Confirm that the ALB is working by visiting its DNS name in a browser.
 
 <details>
@@ -156,8 +152,8 @@ Confirm that the ALB is working by visiting its DNS name in a browser.
   1. Opt to create a **new target group**.
   2. Give your target group a unique name. It's probably a good idea to name it similarly to your ALB.
   3. Keep target type to **Instance**.
-  4. Set protocol and port to `HTTP` and `3000`. These is where your web servers are listening in for incoming traffic.
-  5. For health checks, select `HTTP`, with the path set to `/hello`.
+  4. Set protocol and port to `HTTP` and `80`. These is where your web servers are listening in for incoming traffic.
+  5. For health checks, select `HTTP`, with the path set to `/`.
   6. Under Advanced health check settings, set healthy threshold to `3`, and interval to `10`.
 
 7. In `Step 5`:
