@@ -62,9 +62,25 @@ Make sure that this instance is publicly accessible both for `SSH` and `HTTP`, a
   2. Click the *Launch Instance** button. This will start a step-by-step wizard for creating a new EC2 instance.
   3. In the `Step 1` screen: select an **Ubuntu 18.04 LTS** AMI. 
   4. In the `Step 2` screen: select a `t3.micro` instance. 
-  5. In the `Step 3` screen: all the default values should be OK, however, confirm that the following configuration is set:
+  5. In the `Step 3` screen: confirm that the following configuration is set:
      1. For `Network`, the default VPC is selected.
      2. For `Auto-assign public IP`, make sure this is enabled.
+     3. Expand **Advanced Details** and place the following code in the userdata field:
+     
+     ```
+      #!/bin/bash -ex
+      yum -y update
+      yum -y install httpd php mysql php-mysql
+      chkconfig httpd on
+      sudo systemctl start httpd
+      if [ ! -f /var/www/html/lab2-app.tar.gz ]; then
+      cd /var/www/html
+      wget https://us-west-2-aws-training.s3.amazonaws.com/awsu-ilt/AWS-100-ESS/v4.2/lab-2-configure-website-datastore/scripts/lab2-app.tar.gz
+      tar xvfz lab2-app.tar.gz
+      chown apache:root /var/www/html/rds.conf.php
+      fi
+     ```
+     
   6. In the `Step 4` screen: specify `10 GB` for the root volume.
   7. In the `Step 5` screen: add a **Name** to your instance.
 
