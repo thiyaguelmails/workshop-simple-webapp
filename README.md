@@ -1,4 +1,4 @@
-Module 1: Deploy a Node.js webapp on EC2
+Module 1: Deploy a PHP webapp on EC2
 ===
 
 In this module, we'll walk through how to create an EC2 instance on AWS, 
